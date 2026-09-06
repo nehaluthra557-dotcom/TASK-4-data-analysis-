@@ -1,0 +1,112 @@
+-- TASK 4: SQL FOR DATA ANALYSIS
+-- Dataset: Olist Brazilian E-Commerce Dataset
+-- Database: PostgreSQL
+
+
+-- 1. SELECT, WHERE, ORDER BY
+SELECT
+    order_id,
+    order_status,
+    order_purchase_timestamp
+FROM orders
+WHERE order_status = 'delivered'
+ORDER BY order_purchase_timestamp DESC
+LIMIT 10;
+
+
+-- 2. GROUP BY + COUNT
+SELECT
+    order_status,
+    COUNT(order_id) AS total_orders
+FROM orders
+GROUP BY order_status
+ORDER BY total_orders DESC;
+
+
+-- 3. INNER JOIN
+SELECT
+    o.order_id,
+    o.order_status,
+    c.customer_id,
+    c.customer_city,
+    c.customer_state
+FROM orders o
+INNER JOIN customers c
+    ON o.customer_id = c.customer_id
+WHERE o.order_status = 'delivered'
+LIMIT 10;
+
+
+-- 4. LEFT JOIN
+SELECT
+    c.customer_id,
+    c.customer_city,
+    o.order_id,
+    o.order_status
+FROM customers c
+LEFT JOIN orders o
+    ON c.customer_id = o.customer_id
+LIMIT 10;
+
+
+-- 5. RIGHT JOIN
+SELECT
+    o.order_id,
+    o.order_status,
+    c.customer_id,
+    c.customer_city
+FROM orders o
+RIGHT JOIN customers c
+    ON o.customer_id = c.customer_id
+LIMIT 10;
+
+
+-- 6. SUBQUERY
+SELECT
+    customer_id,
+    customer_city,
+    customer_state
+FROM customers
+WHERE customer_id IN (
+    SELECT customer_id
+    FROM orders
+    WHERE order_status = 'delivered'
+)
+LIMIT 10;
+
+
+-- 7. SUM + AVG
+SELECT
+    SUM(payment_value) AS total_revenue,
+    AVG(payment_value) AS average_payment
+FROM payments;
+
+
+-- 8. CREATE VIEW
+CREATE VIEW delivered_orders AS
+SELECT
+    order_id,
+    customer_id,
+    order_status,
+    order_purchase_timestamp
+FROM orders
+WHERE order_status = 'delivered';
+
+
+-- 9. USE VIEW
+SELECT *
+FROM delivered_orders
+LIMIT 10;
+
+
+-- 10. CREATE INDEX
+CREATE INDEX idx_orders_customer_id
+ON orders(customer_id);
+
+
+-- 11. CHECK INDEX
+SELECT
+    indexname,
+    indexdef
+FROM pg_indexes
+WHERE tablename = 'orders';
